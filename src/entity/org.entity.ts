@@ -1,16 +1,28 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 /**
- * 组织
+ * 部门
  */
 @Entity()
 export class Org {
   @PrimaryGeneratedColumn()
   id: number;
 
+  /**
+   * 部门名称
+   */
   @Column({ unique: true })
   name: string;
 
+  /**
+   * 所属公司
+   */
   @Column()
   companyId: string;
+
+  /**
+   * 优先级
+   */
+  @Column()
+  priority: number;
 }

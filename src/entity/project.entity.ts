@@ -55,7 +55,19 @@ export class Project {
    */
   @Column()
   companyId: string;
-  
+
+  /**
+   * 项目开始时间
+   */
+  @Column()
+  startTime: Date;
+
+  /**
+   * 项目完成时间
+   */
+  @Column()
+  endTime: Date;
+
   @CreateDateColumn()
   createdDate: Date;
 

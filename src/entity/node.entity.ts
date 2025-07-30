@@ -32,4 +32,45 @@ export class Node {
   @Column()
   stageId: string;
 
+  /**
+   * 计划开始时间
+   */
+  @Column()
+  plannedStart: Date;
+
+  /**
+   * 计划结束时间
+   */
+  @Column()
+  plannedEnd: Date;
+
+  /**
+   * 实际开始时间
+   */
+  @Column()
+  actualStart: Date;
+
+  /**
+   * 实际结束时间
+   */
+  @Column()
+  actualEnd: Date;
+
+  /**
+   * 备注
+   */
+  @Column({ length: 256 })
+  remark: string;
+
+  /**
+   * 负责人，多个逗号分割
+   */
+  @Column({ length: 512 })
+  principal: string;
+
+  /**
+   * 完成人
+   */
+  @Column({ length: 512 })
+  handleBy: string;
 }
