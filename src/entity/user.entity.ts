@@ -37,8 +37,14 @@ export class User {
   /**
    * 权限数组 例: ['1001', '1002']
    */
-  @Column({length: 512})
+  @Column({ length: 512 })
   permissions: string;
+
+  /**
+   * 管理员
+   */
+  @Column({ default: false })
+  admin: boolean
 
   @CreateDateColumn()
   createdDate: Date;

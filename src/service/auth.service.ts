@@ -11,13 +11,15 @@ export class AuthService {
   @InjectEntityModel(Org)
   orgRepository: Repository<Org>;
 
-  async register(body: { username: string; password: string; name: number; orgId: number; permissions: string; }): Promise<any> {
+  async register(body: { username: string; password: string; name: string; orgId: number; permissions: string; }): Promise<any> {
     if (!await this.check(body.username, body.password)) {
       return new Promise((res, _) => res({code: -1, message: '用户已存在'}))
     }
-    const user = new User();
+    const user = new User()
+    user.name = body.name
     user.username = body.username
     user.password = body.password
+    user.admin = false
     user.permissions = body.permissions
 
     const org = await this.orgRepository.findOne({where: {id: body.orgId}})
@@ -26,7 +28,7 @@ export class AuthService {
     }
 
     user.org = org
-    return {code: 200, data: await this.userRepository.save(user)};
+    return {code: 200, data: await this.userRepository.save(user)}
   }
 
   async validateUser(username: string, password: string): Promise<User | null> {

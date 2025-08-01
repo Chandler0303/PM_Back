@@ -20,7 +20,7 @@ export class AuthController {
   }
 
   @Post('/register')
-  async register(@Body() body: { username: string; password: string; name: number; orgId: number; permissions: string; }) {
+  async register(@Body() body: { username: string; password: string; name: string; orgId: number; permissions: string; }) {
     const user = await this.authService.register(body);
     return { message: 'User registered', userId: user.id };
   }

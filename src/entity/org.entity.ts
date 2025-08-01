@@ -15,12 +15,6 @@ export class Org {
   name: string;
 
   /**
-   * 所属公司
-   */
-  @Column()
-  companyId: string;
-
-  /**
    * 优先级
    */
   @Column()
