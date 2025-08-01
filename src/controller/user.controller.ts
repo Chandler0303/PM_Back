@@ -13,6 +13,9 @@ export class APIController {
   @Get('/info')
   async getUser() {
     const sessionId = this.ctx.cookies.get('sessionId', { encrypt: true })
-    return { success: true, message: 'OK', data: await this.userService.getCurUser(sessionId) }
+    console.log(sessionId)
+    const user = await this.userService.getCurUser(sessionId)
+    console.log(user)
+    return { success: true, message: 'OK', data: user }
   }
 }
