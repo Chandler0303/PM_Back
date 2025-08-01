@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne } from 'typeorm';
+import { Org } from './org.entity';
 
 /**
  * 用户
@@ -25,6 +26,13 @@ export class User {
    */
   @Column({ length: 64 })
   name: string;
+
+  /**
+   * 部门
+   */
+  @OneToOne(type => Org)
+  @JoinColumn()
+  org: Org;
 
   /**
    * 权限数组 例: ['1001', '1002']

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn, JoinColumn, OneToOne } from 'typeorm';
+import { Company } from './company.entity';
 
 /**
  * 项目
@@ -53,8 +54,9 @@ export class Project {
   /**
    * 分公司
    */
-  @Column()
-  companyId: string;
+  @OneToOne(type => Company)
+  @JoinColumn()
+  companyId: Company;
 
   /**
    * 项目开始时间
