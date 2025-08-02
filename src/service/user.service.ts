@@ -9,6 +9,10 @@ export class UserService {
   userRepository: Repository<User>;
 
   async getCurUser(sessionId: string) {
-    return await this.userRepository.findOne({where: {username: sessionId}})
+    return await this.userRepository.findOne({ where: { username: sessionId } })
+  }
+
+  async list() {
+    return await this.userRepository.find({ select: { id: true, username: true, name: true } })
   }
 }

@@ -14,6 +14,7 @@ export class AuthController {
     const user = await this.authService.validateUser(body.username, body.password);
     if (user) {
       this.ctx.cookies.set('sessionId', user.id.toString(), { encrypt: true });
+      this.ctx.session.user = user
       return { message: 'Login successful' };
     }
     return { message: 'Invalid username or password' };

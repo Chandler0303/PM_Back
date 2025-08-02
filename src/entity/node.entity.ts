@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Stage } from './stage.entity';
 
 /**
  * 流程节点
@@ -21,16 +22,10 @@ export class Node {
   seq: number;
 
   /**
-   * 所属流程id
+   * 所属阶段
    */
-  @Column()
-  procedureId: string;
-
-  /**
-   * 所属阶段id
-   */
-  @Column()
-  stageId: string;
+  @ManyToOne(type => Stage, stage => stage.nodes)
+  stage: Stage;
 
   /**
    * 计划开始时间

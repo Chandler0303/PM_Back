@@ -3,7 +3,7 @@ import { Context } from '@midwayjs/koa';
 import { UserService } from '../service/user.service';
 
 @Controller('/user')
-export class APIController {
+export class UserController {
   @Inject()
   ctx: Context;
 
@@ -12,10 +12,11 @@ export class APIController {
 
   @Get('/info')
   async getUser() {
-    const sessionId = this.ctx.cookies.get('sessionId', { encrypt: true })
-    console.log(sessionId)
-    const user = await this.userService.getCurUser(sessionId)
-    console.log(user)
-    return { success: true, message: 'OK', data: user }
+    return { success: true, data: this.ctx.session.user }
+  }
+
+  @Get("/list")
+  async users() {
+    return { success: true, data: await this.userService.list() }
   }
 }

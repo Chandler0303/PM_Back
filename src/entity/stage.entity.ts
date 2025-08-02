@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany } from 'typeorm';
+import { Node } from './node.entity'
 
 /**
  * 项目阶段节点
@@ -20,9 +21,7 @@ export class Stage {
   @Column()
   seq: number;
 
-  /**
-   * 所属项目id
-   */
-  @Column()
-  projectId: string;
+  @JoinColumn()
+  @OneToMany(type => Node, node => node.stage)
+  nodes: Node[]
 }

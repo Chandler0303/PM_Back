@@ -19,5 +19,5 @@ export class Procedure {
    * 流程配置 参考 /src/template/procedure.json
    */
   @Column({ type: 'json' })
-  config: JSON
+  config: string
 }

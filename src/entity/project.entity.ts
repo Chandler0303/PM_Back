@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn, JoinColumn, OneToOne } from 'typeorm';
 import { Company } from './company.entity';
+import { Stage } from './stage.entity'
 
 /**
  * 项目
@@ -56,7 +57,7 @@ export class Project {
    */
   @OneToOne(type => Company)
   @JoinColumn()
-  companyId: Company;
+  company: Company;
 
   /**
    * 项目开始时间
@@ -69,6 +70,9 @@ export class Project {
    */
   @Column()
   endTime: Date;
+
+  @JoinColumn()
+  stages: Stage[];
 
   @CreateDateColumn()
   createdDate: Date;
