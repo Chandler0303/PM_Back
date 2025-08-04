@@ -30,31 +30,31 @@ export class Node {
   /**
    * 计划开始时间
    */
-  @Column()
+  @Column({nullable: true})
   plannedStart: Date;
 
   /**
    * 计划结束时间
    */
-  @Column()
+  @Column({nullable: true})
   plannedEnd: Date;
 
   /**
    * 实际开始时间
    */
-  @Column()
+  @Column({nullable: true})
   actualStart: Date;
 
   /**
    * 实际结束时间
    */
-  @Column()
+  @Column({nullable: true})
   actualEnd: Date;
 
   /**
    * 备注
    */
-  @Column({ length: 256 })
+  @Column({ nullable: true, length: 256 })
   remark: string;
 
   /**
@@ -66,6 +66,6 @@ export class Node {
   /**
    * 完成人
    */
-  @Column({ length: 512 })
+  @Column({ length: 512, nullable: true })
   handleBy: string;
 }

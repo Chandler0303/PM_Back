@@ -1,6 +1,6 @@
-import { Inject, Controller, Post, Body } from '@midwayjs/core';
-import { AuthService } from '../service/auth.service';
-import { Context } from '@midwayjs/koa'
+import {Inject, Controller, Post, Body} from '@midwayjs/core';
+import {AuthService} from '../service/auth.service';
+import {Context} from '@midwayjs/koa'
 
 @Controller('/auth')
 export class AuthController {
@@ -13,16 +13,22 @@ export class AuthController {
   async login(@Body() body: { username: string; password: string }) {
     const user = await this.authService.validateUser(body.username, body.password);
     if (user) {
-      this.ctx.cookies.set('sessionId', user.id.toString(), { encrypt: true });
+      this.ctx.cookies.set('sessionId', user.id.toString(), {encrypt: true});
       this.ctx.session.user = user
-      return {success: true,  message: 'Login successful' };
+      return {success: true, message: 'Login successful'};
     }
-    return { message: 'Invalid username or password' };
+    return {success: false, message: 'Invalid username or password'};
   }
 
   @Post('/register')
-  async register(@Body() body: { username: string; password: string; name: string; orgId: number; permissions: string; }) {
+  async register(@Body() body: {
+    username: string;
+    password: string;
+    name: string;
+    orgId: number;
+    permissions: string;
+  }) {
     const user = await this.authService.register(body);
-    return { message: 'User registered', userId: user.id };
+    return {success: true, message: 'User registered', userId: user.id};
   }
 }
