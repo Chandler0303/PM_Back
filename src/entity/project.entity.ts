@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn, JoinColumn, OneToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  CreateDateColumn,
+  ManyToOne, OneToMany
+} from 'typeorm';
 import { Company } from './company.entity';
 import { Stage } from './stage.entity'
 
@@ -44,7 +51,7 @@ export class Project {
    * 项目阶段
    */
   @Column()
-  stage: number;
+  stage: number = 1;
 
   /**
    * 工程状态
@@ -55,23 +62,22 @@ export class Project {
   /**
    * 分公司
    */
-  @OneToOne(type => Company)
-  @JoinColumn()
+  @ManyToOne(type => Company)
   company: Company;
 
   /**
    * 项目开始时间
    */
-  @Column()
+  @Column({nullable: true})
   startTime: Date;
 
   /**
    * 项目完成时间
    */
-  @Column()
+  @Column({nullable: true})
   endTime: Date;
 
-  @JoinColumn()
+  @OneToMany(type => Stage, stage => stage.project, {cascade: true})
   stages: Stage[];
 
   @CreateDateColumn()

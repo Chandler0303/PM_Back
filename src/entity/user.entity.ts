@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne
+} from 'typeorm';
 import { Org } from './org.entity';
 
 /**
@@ -30,8 +37,7 @@ export class User {
   /**
    * 部门
    */
-  @OneToOne(type => Org)
-  @JoinColumn()
+  @ManyToOne(type => Org)
   org: Org;
 
   /**

@@ -1,10 +1,11 @@
-import { Provide } from '@midwayjs/core';
-import { InjectEntityModel } from '@midwayjs/typeorm';
-import { Repository, Like, FindOptionsOrder } from 'typeorm';
-import { Project } from '../entity/project.entity';
-import { Stage } from '../entity/stage.entity';
-import { Node } from '../entity/node.entity';
-import { Procedure } from '../entity/procedure.entity';
+import {ILogger, Logger, Provide} from '@midwayjs/core';
+import {InjectEntityModel} from '@midwayjs/typeorm';
+import {FindOptionsOrder, Like, Repository} from 'typeorm';
+import {Project} from '../entity/project.entity';
+import {Stage} from '../entity/stage.entity';
+import {Node} from '../entity/node.entity';
+import {Procedure} from '../entity/procedure.entity';
+import {Company} from "../entity/company.entity";
 
 @Provide()
 export class ProjectService {
@@ -16,12 +17,17 @@ export class ProjectService {
   nodeRepository: Repository<Node>
   @InjectEntityModel(Procedure)
   procedureRepository: Repository<Procedure>
+  @InjectEntityModel(Company)
+  companyRepository: Repository<Company>
+
+  @Logger('project')
+  logger: ILogger
 
   async page(params: {
     projCode: string, year: string, name: string, type: string,
     stage: number, status: number, companyId: number,
     page: number, pageSize: number, sortField: string, sortDir: string
-  }|any) {
+  } | any) {
     const where = {}
     params.projCode && (where['projCode'] = Like(`%${params.projCode}%`))
     params.year && (where['year'] = params.year)
@@ -35,12 +41,28 @@ export class ProjectService {
     const pageSize = params.pageSize || 10
     const skip = (page - 1) * pageSize
 
-    const order: FindOptionsOrder<Project> = params.sortField ? { [params.sortField]: params.sortDir || 'ASC' } : null
-    return this.projectRepository.find({ where, order, skip, take: pageSize })
+    const order: FindOptionsOrder<Project> = params.sortField ? {[params.sortField]: params.sortDir || 'ASC'} : null
+    return this.projectRepository.find({where, order, skip, take: pageSize})
   }
 
   async create(project: Project) {
-    this.projectRepository.save(project)
+    if (!project) {
+      this.logger.error('project is null')
+      return
+    }
+    const stages = project.stages
+
+    await this.projectRepository.save(project)
+    if (stages) {
+      stages.forEach(stage => {
+        this.stageRepository.save(stage)
+        if (stage.nodes) {
+          stage.nodes.forEach(node => {
+            this.nodeRepository.save(node)
+          })
+        }
+      })
+    }
   }
 
   async procedureList(): Promise<Procedure[]> {
@@ -60,18 +82,23 @@ export class ProjectService {
     this.procedureRepository.save(target);
   }
 
-  // private genProj(cfgStr: string) {
-  //   const cfg = JSON.parse(cfgStr)
-  //   cfg?.stages?.array.forEach(sc => {
-  //     const s = new Stage()
-  //     s.seq = sc.seq
-  //     s.name = sc.stageName
-  //     sc.nodes?.array.map(nc => {
-  //       const n = new Node()
-  //       n.name = nc.name
-  //       n.seq = nc.seq
+  async modify(body: any) {
+    return this.projectRepository.updateAll(body.project)
+  }
 
-  //     });
-  //   });
-  // }
+  async modifyNode(body: any) {
+    return this.nodeRepository.updateAll(body.node)
+  }
+
+  async delete(id: number) {
+    const project = await this.projectRepository.findOneBy({id})
+    if (!project) {
+      return
+    }
+
+    // project.status && await this.stageRepository.delete()
+    // await this.stageRepository.delete({projectId: id})
+    // await this.nodeRepository.delete({projectId: id})
+    // return this.projectRepository.delete(id)
+  }
 }

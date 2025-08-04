@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany } from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany, ManyToOne} from 'typeorm';
 import { Node } from './node.entity'
+import {Project} from "./project.entity";
 
 /**
  * 项目阶段节点
@@ -21,7 +22,10 @@ export class Stage {
   @Column()
   seq: number;
 
+  @ManyToOne(type => Project)
+  project: Project;
+
   @JoinColumn()
-  @OneToMany(type => Node, node => node.stage)
+  @OneToMany(type => Node, node => node.stage, {cascade: true})
   nodes: Node[]
 }
