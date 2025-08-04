@@ -21,7 +21,7 @@ export class ProjectService {
     projCode: string, year: string, name: string, type: string,
     stage: number, status: number, companyId: number,
     page: number, pageSize: number, sortField: string, sortDir: string
-  }) {
+  }|any) {
     const where = {}
     params.projCode && (where['projCode'] = Like(`%${params.projCode}%`))
     params.year && (where['year'] = params.year)
@@ -57,7 +57,7 @@ export class ProjectService {
   //       const n = new Node()
   //       n.name = nc.name
   //       n.seq = nc.seq
-        
+
   //     });
   //   });
   // }
