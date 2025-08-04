@@ -129,7 +129,7 @@
                     ]
                 },
                 {
-                    "seq": 1,
+                    "seq": 3,
                     "name": "总包结算",
                     "plannedDays": 15,
                     "participants": [
@@ -180,7 +180,7 @@
                     ]
                 },
                 {
-                    "seq": 2,
+                    "seq": 3,
                     "name": "项目账务关闭",
                     "plannedDays": 5,
                     "participants": [

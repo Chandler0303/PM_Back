@@ -23,6 +23,15 @@ export class ProjectController {
   async procedures() {
     return { success: true, data: await this.projectService.procedureList() }
   }
+  /**
+   * 流程模版配置
+   */
+  @Put('/procedureConfig')
+  async procedureConfig(@Body() params) {
+    console.log(params)
+    await this.projectService.procedureConfigUpdate(params)
+    return { success: true }
+  }
 
   /**
    * 创建项目

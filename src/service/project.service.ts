@@ -46,6 +46,19 @@ export class ProjectService {
   async procedureList(): Promise<Procedure[]> {
     return this.procedureRepository.find();
   }
+  async procedureConfigUpdate(procedure: Procedure) {
+
+    // 第一步：先查出目标数据
+    const target = await this.procedureRepository.findOne({
+      where: { id: procedure.id },
+    });
+
+    // 第二步：更新 config 字段
+    target.config = procedure.config;
+
+    // 第三步：保存更新
+    this.procedureRepository.save(target);
+  }
 
   // private genProj(cfgStr: string) {
   //   const cfg = JSON.parse(cfgStr)
