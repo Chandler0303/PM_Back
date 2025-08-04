@@ -39,8 +39,8 @@ export class ProjectService {
     return this.projectRepository.find({ where, order, skip, take: pageSize })
   }
 
-  async create(params: {project: Project}) {
-    this.projectRepository.save(params.project)
+  async create(project: Project) {
+    this.projectRepository.save(project)
   }
 
   async procedureList(): Promise<Procedure[]> {

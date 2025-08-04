@@ -1,4 +1,4 @@
-import { Inject, Controller, Get, Post, Put, Del } from '@midwayjs/core';
+import { Inject, Controller, Get, Post, Put, Del, Body } from '@midwayjs/core';
 import { Context } from '@midwayjs/koa';
 import { ProjectService } from '../service/project.service'
 
@@ -21,7 +21,7 @@ export class ProjectController {
   }
 
   @Post('/')
-  async create(project: any) {
+  async create(@Body() project: any) {
     await this.projectService.create(project)
     return { success: true }
   }
