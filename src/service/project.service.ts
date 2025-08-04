@@ -96,9 +96,13 @@ export class ProjectService {
       return
     }
 
-    // project.status && await this.stageRepository.delete()
-    // await this.stageRepository.delete({projectId: id})
-    // await this.nodeRepository.delete({projectId: id})
-    // return this.projectRepository.delete(id)
+    if (project.stages) {
+      project.stages.forEach(stage => {
+        stage.nodes && stage.nodes.forEach(node => {
+          this.stageRepository.delete(stage)
+          this.nodeRepository.delete(node.id)
+        })
+      })
+    }
   }
 }
