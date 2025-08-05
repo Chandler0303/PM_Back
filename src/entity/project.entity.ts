@@ -77,7 +77,7 @@ export class Project {
   @Column({nullable: true})
   endTime: Date;
 
-  @OneToMany(type => Stage, stage => stage.project, {cascade: true})
+  @OneToMany(type => Stage, stage => stage.project, {cascade: true, onDelete: 'CASCADE'})
   stages: Stage[];
 
   @CreateDateColumn()

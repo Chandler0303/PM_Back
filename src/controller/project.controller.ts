@@ -23,6 +23,7 @@ export class ProjectController {
   async procedures() {
     return {success: true, data: await this.projectService.procedureList()}
   }
+
   /**
    * 流程模版配置
    */
@@ -62,8 +63,8 @@ export class ProjectController {
   }
 
   @Del('/:id')
-  async delete(@Param('id') id: string) {
-    await this.projectService.delete(+id)
+  async delete(@Param('id') id: number) {
+    await this.projectService.delete(id)
     return {success: true}
   }
 }
