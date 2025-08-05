@@ -45,8 +45,8 @@ export class ProjectController {
   }
 
   @Put('/modify')
-  async modify() {
-    await this.projectService.modify(this.ctx.body)
+  async modify(@Body() params: Project) {
+    await this.projectService.modify(params)
     return {success: true}
   }
 
@@ -56,8 +56,8 @@ export class ProjectController {
   }
 
   @Put('/node/modify')
-  async nodeModify() {
-    await this.projectService.modifyNode(this.ctx.body)
+  async nodeModify(@Body() params: any) {
+    await this.projectService.modifyNode(params)
     return {success: true}
   }
 

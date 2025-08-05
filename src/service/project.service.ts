@@ -42,8 +42,7 @@ export class ProjectService {
     const skip = (page - 1) * pageSize
 
     const order: FindOptionsOrder<Project> = params.sortField ? {[params.sortField]: params.sortDir || 'ASC'} : null
-
-    return this.projectRepository.find({where, order, skip, take: pageSize})
+    return this.projectRepository.find({where, order, skip, take: pageSize, relations: ['company', 'stages', 'stages.nodes']})
   }
 
   async create(project: Project) {
@@ -83,23 +82,31 @@ export class ProjectService {
     this.procedureRepository.save(target);
   }
 
-  async modify(body: any) {
-    return this.projectRepository.updateAll(body.project)
+  async modify(project: any) {
+    return this.projectRepository.updateAll(project)
   }
 
-  async modifyNode(body: any) {
-    return this.nodeRepository.updateAll(body.node)
+  async modifyNode(node: any) {
+    return this.nodeRepository.save(node)
   }
 
   async delete(id: number) {
-    const project = await this.projectRepository.findOneBy({id})
+    const project = await this.projectRepository.findOne({
+      where: { id },
+      relations: ['stages']
+    })
     if (!project) {
       return
     }
 
-    // project.status && await this.stageRepository.delete()
-    // await this.stageRepository.delete({projectId: id})
-    // await this.nodeRepository.delete({projectId: id})
-    // return this.projectRepository.delete(id)
+    if (project.stages) {
+      project.stages.forEach(stage => {
+        stage.nodes && stage.nodes.forEach(node => {
+          this.stageRepository.delete(stage)
+          this.nodeRepository.delete(node.id)
+        })
+      })
+    }
+    this.projectRepository.delete(id)
   }
 }
