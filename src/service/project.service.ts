@@ -42,7 +42,7 @@ export class ProjectService {
     const skip = (page - 1) * pageSize
 
     const order: FindOptionsOrder<Project> = params.sortField ? {[params.sortField]: params.sortDir || 'ASC'} : null
-    return this.projectRepository.find({where, order, skip, take: pageSize})
+    return this.projectRepository.find({where, order, skip, take: pageSize, relations: ['company', 'stages', 'stages.nodes']})
   }
 
   async create(project: Project) {
