@@ -68,12 +68,14 @@ export class ProjectService {
       return
     }
 
+    console.log(project)
     const exist = await this.projectRepository.find({
       where: [
         {name: project.name}, {projCode: project.projCode}
       ], take: 1
     })
-    if (exist) {
+    console.log(exist)
+    if (exist && exist.length > 0) {
       console.log('project already exist')
       if (exist[0].name === project.name) {
         return {success: false, message: `项目名称：${project.name}已存在`, data: exist}
@@ -118,17 +120,17 @@ export class ProjectService {
     //   return
     // }
     // await this.projectRepository.remove(proj)
-    const project = await this.projectRepository.findOne({where: {id}, relations: ['stages', 'stages.nodes']})
+    const project = await this.projectRepository.findOne({where: {id}, relations: ['stages']})
     if (!project) {
       return
     }
+    console.log(project)
 
     if (project.stages) {
       project.stages.forEach(stage => {
+        console.log(stage)
+        this.nodeRepository.delete({stage: stage})
         this.stageRepository.delete(stage)
-        stage.nodes && stage.nodes.forEach(async node => {
-          this.nodeRepository.delete(node.id)
-        })
       })
     }
     await this.projectRepository.remove(project)
