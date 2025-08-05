@@ -6,6 +6,7 @@ import {Stage} from '../entity/stage.entity';
 import {Node} from '../entity/node.entity';
 import {Procedure} from '../entity/procedure.entity';
 import {Company} from "../entity/company.entity";
+import {Context} from "@midwayjs/koa";
 
 @Provide()
 export class ProjectService {
@@ -26,8 +27,9 @@ export class ProjectService {
   async page(params: {
     projCode: string, year: string, name: string, type: string,
     stage: number, status: number, companyId: number,
-    page: number, pageSize: number, sortField: string, sortDir: string
+    page: number, size: number, sortField: string, sortDir: string
   } | any) {
+
     const where = {}
     params.projCode && (where['projCode'] = Like(`%${params.projCode}%`))
     params.year && (where['year'] = params.year)
@@ -37,12 +39,27 @@ export class ProjectService {
     params.status && (where['status'] = params.status)
     params.companyId && (where['companyId'] = params.companyId)
 
+    const count = await this.projectRepository.countBy(where)
+    if (!count || count < 1) {
+      return {total: count}
+    }
+
     const page = params.page || 1
-    const pageSize = params.pageSize || 10
-    const skip = (page - 1) * pageSize
+    const size = params.size || 10
+    const skip = (page - 1) * size
 
     const order: FindOptionsOrder<Project> = params.sortField ? {[params.sortField]: params.sortDir || 'ASC'} : null
-    return this.projectRepository.find({where, order, skip, take: pageSize, relations: ['company', 'stages', 'stages.nodes']})
+
+    return {
+      total: count,
+      data: await this.projectRepository.find({
+        where,
+        order,
+        skip,
+        take: size,
+        relations: ['company', 'stages', 'stages.nodes']
+      })
+    }
   }
 
   async create(project: Project) {
@@ -50,29 +67,34 @@ export class ProjectService {
       this.logger.error('project is null')
       return
     }
-    const stages = project.stages
-    
-    await this.projectRepository.save(project)
-    if (stages) {
-      stages.forEach(stage => {
-        this.stageRepository.save(stage)
-        if (stage.nodes) {
-          stage.nodes.forEach(node => {
-            this.nodeRepository.save(node)
-          })
-        }
-      })
+
+    const exist = await this.projectRepository.find({
+      where: [
+        {name: project.name}, {projCode: project.projCode}
+      ], take: 1
+    })
+    if (exist) {
+      console.log('project already exist')
+      if (exist[0].name === project.name) {
+        return {success: false, message: `项目名称：${project.name}已存在`, data: exist}
+      } else {
+        return {success: false, message: `项目编号：${project.projCode}已存在`, data: exist}
+      }
     }
+
+    await this.projectRepository.save(project)
+    return {success: true, data: project}
   }
 
   async procedureList(): Promise<Procedure[]> {
-    return this.procedureRepository.find();
+    return await this.procedureRepository.find();
   }
+
   async procedureConfigUpdate(procedure: Procedure) {
 
     // 第一步：先查出目标数据
     const target = await this.procedureRepository.findOne({
-      where: { id: procedure.id },
+      where: {id: procedure.id},
     });
 
     // 第二步：更新 config 字段
@@ -91,22 +113,44 @@ export class ProjectService {
   }
 
   async delete(id: number) {
-    const project = await this.projectRepository.findOne({
-      where: { id },
-      relations: ['stages']
-    })
+    // const proj = await this.projectRepository.findOneBy({id})
+    // if (!proj) {
+    //   return
+    // }
+    // await this.projectRepository.remove(proj)
+    const project = await this.projectRepository.findOne({where: {id}, relations: ['stages', 'stages.nodes']})
     if (!project) {
       return
     }
 
     if (project.stages) {
       project.stages.forEach(stage => {
-        stage.nodes && stage.nodes.forEach(node => {
-          this.stageRepository.delete(stage)
+        this.stageRepository.delete(stage)
+        stage.nodes && stage.nodes.forEach(async node => {
           this.nodeRepository.delete(node.id)
         })
       })
     }
-    this.projectRepository.delete(id)
+    await this.projectRepository.remove(project)
+  }
+
+  async nodeStart(nodeId: number) {
+    await this.nodeRepository.update({
+      actualStart: new Date()
+    }, {id: nodeId})
+    return {success: true}
+  }
+
+  async nodeComplete(nodeId: number, ctx: Context) {
+    const user = ctx.session.user
+    if (!user || !user.id) {
+      return {success: false, message: '用户未登录'}
+    }
+
+    await this.nodeRepository.update({
+      actualEnd: new Date(),
+      handleBy: user.id
+    }, {id: nodeId})
+    return {success: true}
   }
 }

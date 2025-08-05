@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany, ManyToOne} from 'typeorm';
-import { Node } from './node.entity'
+import {Node} from './node.entity'
 import {Project} from "./project.entity";
 
 /**
@@ -13,7 +13,7 @@ export class Stage {
   /**
    * 阶段名称
    */
-  @Column({ unique: true, length: 64 })
+  @Column({length: 64})
   name: string;
 
   /**
@@ -26,6 +26,6 @@ export class Stage {
   project: Project;
 
   @JoinColumn()
-  @OneToMany(type => Node, node => node.stage, {cascade: true})
+  @OneToMany(type => Node, node => node.stage, {cascade: true, onDelete: 'CASCADE'})
   nodes: Node[]
 }

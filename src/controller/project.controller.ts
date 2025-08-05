@@ -23,6 +23,7 @@ export class ProjectController {
   async procedures() {
     return {success: true, data: await this.projectService.procedureList()}
   }
+
   /**
    * 流程模版配置
    */
@@ -30,7 +31,7 @@ export class ProjectController {
   async procedureConfig(@Body() params) {
     console.log(params)
     await this.projectService.procedureConfigUpdate(params)
-    return { success: true }
+    return {success: true}
   }
 
   /**
@@ -50,20 +51,43 @@ export class ProjectController {
     return {success: true}
   }
 
-  @Put('/node/complete')
-  async nodeComplete() {
+  /**
+   * 开始任务
+   * @param nodeId 任务id
+   */
+  @Put('/node/:nodeId/start')
+  async nodeStart(@Param('nodeId') nodeId: number) {
+    await this.projectService.nodeStart(nodeId)
     return {success: true}
   }
 
+  /**
+   * 完成任务
+   * @param nodeId 任务id
+   */
+  @Put('/node/:nodeId/complete')
+  async nodeComplete(@Param('nodeId') nodeId: number) {
+    await this.projectService.nodeComplete(nodeId, this.ctx)
+    return {success: true}
+  }
+
+  /**
+   * 修改任务
+   */
   @Put('/node/modify')
   async nodeModify(@Body() params: any) {
     await this.projectService.modifyNode(params)
     return {success: true}
   }
 
+  /**
+   * 删除任务
+   *
+   * @param id
+   */
   @Del('/:id')
-  async delete(@Param('id') id: string) {
-    await this.projectService.delete(+id)
+  async delete(@Param('id') id: number) {
+    await this.projectService.delete(id)
     return {success: true}
   }
 }

@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Stage } from './stage.entity';
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Stage} from './stage.entity';
 
 /**
  * 流程节点
@@ -54,18 +54,24 @@ export class Node {
   /**
    * 备注
    */
-  @Column({ nullable: true, length: 256 })
+  @Column({nullable: true, length: 256})
   remark: string;
 
   /**
    * 负责人，多个逗号分割
    */
-  @Column({ length: 512 })
+  @Column({length: 512})
   principal: string;
+
+  /**
+   * 制度要求时间
+   */
+  @Column({nullable: true})
+  plannedDays: number;
 
   /**
    * 完成人
    */
-  @Column({ length: 512, nullable: true })
+  @Column({length: 512, nullable: true})
   handleBy: string;
 }
