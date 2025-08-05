@@ -6,6 +6,7 @@ import {Stage} from '../entity/stage.entity';
 import {Node} from '../entity/node.entity';
 import {Procedure} from '../entity/procedure.entity';
 import {Company} from "../entity/company.entity";
+import {Context} from "@midwayjs/koa";
 
 @Provide()
 export class ProjectService {
@@ -67,9 +68,11 @@ export class ProjectService {
       return
     }
 
-    const exist = await this.projectRepository.find({where: [
+    const exist = await this.projectRepository.find({
+      where: [
         {name: project.name}, {projCode: project.projCode}
-      ], take: 1})
+      ], take: 1
+    })
     if (exist) {
       console.log('project already exist')
       if (exist[0].name === project.name) {
@@ -84,7 +87,7 @@ export class ProjectService {
   }
 
   async procedureList(): Promise<Procedure[]> {
-    return this.procedureRepository.find();
+    return await this.procedureRepository.find();
   }
 
   async procedureConfigUpdate(procedure: Procedure) {
@@ -110,19 +113,44 @@ export class ProjectService {
   }
 
   async delete(id: number) {
-    await this.projectRepository.delete({id})
-    // const project = await this.projectRepository.findOneBy({id})
-    // if (!project) {
+    // const proj = await this.projectRepository.findOneBy({id})
+    // if (!proj) {
     //   return
     // }
-    //
-    // if (project.stages) {
-    //   project.stages.forEach(stage => {
-    //     stage.nodes && stage.nodes.forEach(node => {
-    //       this.stageRepository.delete(stage)
-    //       this.nodeRepository.delete(node.id)
-    //     })
-    //   })
-    // }
+    // await this.projectRepository.remove(proj)
+    const project = await this.projectRepository.findOne({where: {id}, relations: ['stages', 'stages.nodes']})
+    if (!project) {
+      return
+    }
+
+    if (project.stages) {
+      project.stages.forEach(stage => {
+        this.stageRepository.delete(stage)
+        stage.nodes && stage.nodes.forEach(async node => {
+          this.nodeRepository.delete(node.id)
+        })
+      })
+    }
+    await this.projectRepository.remove(project)
+  }
+
+  async nodeStart(nodeId: number) {
+    await this.nodeRepository.update({
+      actualStart: new Date()
+    }, {id: nodeId})
+    return {success: true}
+  }
+
+  async nodeComplete(nodeId: number, ctx: Context) {
+    const user = ctx.session.user
+    if (!user || !user.id) {
+      return {success: false, message: '用户未登录'}
+    }
+
+    await this.nodeRepository.update({
+      actualEnd: new Date(),
+      handleBy: user.id
+    }, {id: nodeId})
+    return {success: true}
   }
 }

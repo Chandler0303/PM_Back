@@ -6,8 +6,8 @@ import {
   CreateDateColumn,
   ManyToOne, OneToMany
 } from 'typeorm';
-import { Company } from './company.entity';
-import { Stage } from './stage.entity'
+import {Company} from './company.entity';
+import {Stage} from './stage.entity'
 
 /**
  * 项目
@@ -20,7 +20,7 @@ export class Project {
   /**
    * 工程编号
    */
-  @Column({ unique: true })
+  @Column({unique: true})
   projCode: string;
 
   /**
@@ -32,7 +32,7 @@ export class Project {
   /**
    * 工程名称
    */
-  @Column({ unique: true })
+  @Column({unique: true})
   name: string;
 
   /**
