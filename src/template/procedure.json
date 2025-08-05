@@ -42,11 +42,11 @@
         },
         {
             "seq": 3,
-            "stageName": "技经中心完成成本下达",
+            "stageName": "成本下达阶段",
             "nodes": [
                 {
                     "seq": 1,
-                    "name": "合同交底会",
+                    "name": "技经中心完成成本下达",
                     "plannedDays": 10,
                     "participants": [
                         1,

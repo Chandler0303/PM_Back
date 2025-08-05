@@ -12,7 +12,7 @@ export class ProjectController {
 
   @Get('/page')
   async page() {
-    const projectPage = this.projectService.page(this.ctx.query);
+    const projectPage = await this.projectService.page(this.ctx.query);
     return {success: true, data: projectPage}
   }
 
@@ -39,8 +39,8 @@ export class ProjectController {
    * @param params 项目信息 包含阶段+节点
    */
   @Post('/')
-  async create(@Body() params: { project: Project }) {
-    await this.projectService.create(params.project)
+  async create(@Body() params: Project) {
+    await this.projectService.create(params)
     return {success: true}
   }
 

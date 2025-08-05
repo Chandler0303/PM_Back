@@ -42,6 +42,7 @@ export class ProjectService {
     const skip = (page - 1) * pageSize
 
     const order: FindOptionsOrder<Project> = params.sortField ? {[params.sortField]: params.sortDir || 'ASC'} : null
+
     return this.projectRepository.find({where, order, skip, take: pageSize})
   }
 
@@ -51,7 +52,7 @@ export class ProjectService {
       return
     }
     const stages = project.stages
-
+    
     await this.projectRepository.save(project)
     if (stages) {
       stages.forEach(stage => {
