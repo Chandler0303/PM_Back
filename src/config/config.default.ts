@@ -12,7 +12,7 @@ export default {
       default: {
         type: 'sqlite',
         database: path.join(__dirname, '../../pm.sqlite'),
-        synchronize: false,
+        synchronize: true,
         foreignKeys: true,
         logging: true,
         entities: [

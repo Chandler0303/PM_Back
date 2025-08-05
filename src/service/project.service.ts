@@ -115,11 +115,6 @@ export class ProjectService {
   }
 
   async delete(id: number) {
-    // const proj = await this.projectRepository.findOneBy({id})
-    // if (!proj) {
-    //   return
-    // }
-    // await this.projectRepository.remove(proj)
     const project = await this.projectRepository.findOne({where: {id}, relations: ['stages']})
     if (!project) {
       return
