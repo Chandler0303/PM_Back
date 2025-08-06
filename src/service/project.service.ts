@@ -1,6 +1,6 @@
 import {ILogger, Logger, Provide} from '@midwayjs/core';
 import {InjectEntityModel} from '@midwayjs/typeorm';
-import {FindOptionsOrder, Like, Repository} from 'typeorm';
+import {Brackets, FindOptionsOrder, Like, Repository} from 'typeorm';
 import {Project} from '../entity/project.entity';
 import {Stage} from '../entity/stage.entity';
 import {Node} from '../entity/node.entity';
@@ -60,6 +60,75 @@ export class ProjectService {
         relations: ['company', 'stages', 'stages.nodes']
       })
     }
+  }
+
+  async pageV2(params: {
+    projCode: string, year: string, name: string, type: string,
+    delayed: boolean,
+    stage: number, status: number, companyId: number,
+    page: number, size: number, sortField: string, sortDir: string
+  } | any) {
+
+    const projIds = await this.getProjByState(params.delayed)
+    if (projIds !== null && projIds.length == 0) {
+      return {total: 0}
+    }
+
+    const page = params.page || 1
+    const size = params.size || 10
+    const skip = (page - 1) * size
+
+    const sortField = params.sortField || 'project.id'
+    const sortDir = params.sortDir || 'ASC'
+
+    const [contents, total] = await this.projectRepository.createQueryBuilder('project')
+      .leftJoinAndSelect('project.company', 'company')
+      .leftJoinAndSelect('project.stages', 'stages')
+      .leftJoinAndSelect('stages.nodes', 'node')
+      .where(new Brackets(qb => {
+        params.projCode && qb.where('project.projCode LIKE :projCode', {projCode: `%${params.projCode}%`})
+        params.year && qb.andWhere('project.year = :year', {year: params.year})
+        params.name && qb.andWhere('project.name LIKE :name', {name: `%${params.name}%`})
+        params.type && qb.andWhere('project.type = :type', {type: params.type})
+        params.stage && qb.andWhere('project.stage = :stage', {stage: params.stage})
+        params.status && qb.andWhere('project.status = :status', {status: params.status})
+        params.companyId && qb.andWhere('project.companyId = :companyId', {companyId: params.companyId})
+        if (projIds !== null && projIds.length > 0) {
+          if (params.delayed === 'true') {
+            qb.andWhere('project.id IN (:...projIds)', {projIds})
+          } else {
+            qb.andWhere('project.id NOT IN (:...projIds)', {projIds})
+          }
+        }
+      }))
+      .orderBy(sortField, sortDir)
+      .skip(skip)
+      .take(size)
+      .getManyAndCount()
+
+    return {total, data: contents}
+  }
+
+  private async getProjByState(delayed: boolean | null): Promise<number[] | null> {
+    let projIds = null
+    if (delayed) {
+      const nodes = await this.nodeRepository.createQueryBuilder('node')
+        .leftJoinAndSelect('node.stage', 'stage')
+        .leftJoinAndSelect('stage.project', 'project')
+        .where(new Brackets(qb => {
+            qb.andWhere(
+              new Brackets(qb => {
+                qb.where('node.actualStart IS NOT NULL')
+                  .andWhere('node.actualEnd IS NULL')
+                  .andWhere("node.plannedEnd <= 'datetime(now)'")
+              })
+            )
+          }
+        )).getMany()
+
+      nodes && (projIds = nodes.map(n => n.stage.project.id))
+    }
+    return projIds
   }
 
   async create(project: Project) {
@@ -149,5 +218,9 @@ export class ProjectService {
       handleBy: user.id
     }, {id: nodeId})
     return {success: true}
+  }
+
+  async list(query: any) {
+    return this.projectRepository.find()
   }
 }
