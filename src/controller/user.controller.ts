@@ -18,7 +18,7 @@ export class UserController {
 
   @Get("/list")
   async users() {
-    return { success: true, data: await this.userService.list() }
+    return { success: true, data: await this.userService.list(this.ctx.query) }
   }
   @Post('/')
   async create(@Body() params: User) {

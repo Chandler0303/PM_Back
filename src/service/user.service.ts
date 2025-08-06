@@ -1,6 +1,6 @@
 import { Provide } from '@midwayjs/core';
 import { InjectEntityModel } from '@midwayjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
 import { Org } from '../entity/org.entity';
 
@@ -21,8 +21,11 @@ export class UserService {
     this.userRepository.save(user);
   }
 
-  async list() {
+  async list(query: {name: string} | any) {
+    const where = {admin: false}
+    query.name && (where['name'] = Like(`%${query.name}%`))
     return await this.userRepository.find({
+      where,
       select: { id: true, username: true, name: true, password: true, permissions: true },
       relations: ['org'],
     });
