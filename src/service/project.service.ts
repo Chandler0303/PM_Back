@@ -29,6 +29,7 @@ export class ProjectService {
     stage: number, status: number, companyId: number,
     page: number, size: number, sortField: string, sortDir: string
   } | any) {
+    console.log('params', params)
 
     const where = {}
     params.projCode && (where['projCode'] = Like(`%${params.projCode}%`))
@@ -49,7 +50,6 @@ export class ProjectService {
     const skip = (page - 1) * size
 
     const order: FindOptionsOrder<Project> = params.sortField ? {[params.sortField]: params.sortDir || 'ASC'} : null
-
     return {
       total: count,
       data: await this.projectRepository.find({
