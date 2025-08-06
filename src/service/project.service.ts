@@ -219,4 +219,8 @@ export class ProjectService {
     }, {id: nodeId})
     return {success: true}
   }
+
+  async list(query: any) {
+    return this.projectRepository.find()
+  }
 }

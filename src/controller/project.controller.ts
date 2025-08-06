@@ -10,6 +10,14 @@ export class ProjectController {
   @Inject()
   projectService: ProjectService;
 
+  /**
+   * 查询全部项目
+   */
+  @Get('/list')
+  async list() {
+    return {success: true, data: await this.projectService.list(this.ctx.query)}
+  }
+
   @Get('/page')
   async page() {
     const projectPage = await this.projectService.pageV2(this.ctx.query);
