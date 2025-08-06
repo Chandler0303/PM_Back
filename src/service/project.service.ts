@@ -176,7 +176,7 @@ export class ProjectService {
   }
 
   async modify(project: any) {
-    return this.projectRepository.updateAll(project)
+    return this.projectRepository.save(project)
   }
 
   async modifyNode(node: any) {
@@ -188,16 +188,13 @@ export class ProjectService {
     if (!project) {
       return
     }
-    console.log(project)
-
     if (project.stages) {
-      project.stages.forEach(stage => {
-        console.log(stage)
-        this.nodeRepository.delete({stage: stage})
-        this.stageRepository.delete(stage)
-      })
+      for (let i = 0; i < project.stages.length; i++) {
+        await this.nodeRepository.delete({stage: project.stages[i]})
+        await this.stageRepository.delete(project.stages[i].id)
+      }
     }
-    await this.projectRepository.remove(project)
+    await this.projectRepository.delete(project.id)
   }
 
   async nodeStart(nodeId: number) {
@@ -220,7 +217,13 @@ export class ProjectService {
     return {success: true}
   }
 
-  async list(query: any) {
-    return this.projectRepository.find()
+  async list(params: any) {
+    const where = {}
+    params.name && (where['name'] = Like(`%${params.name}%`))
+    let data = await this.projectRepository.find({
+      where,
+      relations: ['company', 'stages', 'stages.nodes']
+    })
+     return data
   }
 }

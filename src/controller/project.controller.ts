@@ -37,7 +37,6 @@ export class ProjectController {
    */
   @Put('/procedureConfig')
   async procedureConfig(@Body() params) {
-    console.log(params)
     await this.projectService.procedureConfigUpdate(params)
     return {success: true}
   }
