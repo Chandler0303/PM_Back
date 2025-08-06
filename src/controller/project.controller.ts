@@ -12,7 +12,7 @@ export class ProjectController {
 
   @Get('/page')
   async page() {
-    const projectPage = await this.projectService.page(this.ctx.query);
+    const projectPage = await this.projectService.pageV2(this.ctx.query);
     return {success: true, data: projectPage}
   }
 
