@@ -22,8 +22,7 @@ export class UserController {
   }
   @Post('/')
   async create(@Body() params: User) {
-    await this.userService.create(params)
-    return { success: true }
+    return this.userService.create(params)
   }
    @Put('/:id')
   async updateUser(

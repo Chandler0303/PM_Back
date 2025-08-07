@@ -48,14 +48,12 @@ export class ProjectController {
    */
   @Post('/')
   async create(@Body() params: Project) {
-    await this.projectService.create(params)
-    return {success: true}
+    return this.projectService.create(params)
   }
 
   @Put('/modify')
   async modify(@Body() params: Project) {
-    await this.projectService.modify(params)
-    return {success: true}
+    return this.projectService.modify(params)
   }
 
   /**
