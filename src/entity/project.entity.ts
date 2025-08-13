@@ -48,6 +48,12 @@ export class Project {
   type: string;
 
   /**
+   * 是否搁置
+   */
+  @Column()
+  shelve: number = 0;
+
+  /**
    * 项目阶段
    */
   @Column()

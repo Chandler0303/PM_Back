@@ -314,6 +314,7 @@ export class ProjectService {
   async list(params: any) {
     const where = {};
     params.name && (where['name'] = Like(`%${params.name}%`));
+    params.year && (where['year'] = params.year);
     const qb = this.projectRepository
       .createQueryBuilder('project')
       .leftJoinAndSelect('project.company', 'company')
