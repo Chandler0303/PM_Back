@@ -52,6 +52,18 @@ export class Node {
   actualEnd: Date;
 
   /**
+   * 节点状态
+   */
+  @Column()
+  status: number;
+
+  /**
+   * 节点类型
+   */
+  @Column()
+  type: number;
+
+  /**
    * 备注
    */
   @Column({nullable: true, length: 256})
