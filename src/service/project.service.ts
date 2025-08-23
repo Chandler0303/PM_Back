@@ -7,10 +7,6 @@ import { Node } from '../entity/node.entity';
 import { Procedure } from '../entity/procedure.entity';
 import { Company } from '../entity/company.entity';
 import { Context } from '@midwayjs/koa';
-import * as path from 'path';
-import * as fs from 'fs';
-import { parse } from 'fast-csv';
-import * as ExcelJS from 'exceljs';
 
 @Provide()
 export class ProjectService {
@@ -154,72 +150,6 @@ export class ProjectService {
     return { total, data: contents };
   }
 
-  async handleImport(file) {
-    const ext = path.extname(file.filename).toLowerCase();
-
-    if (ext === '.csv') {
-      await this.parseCSV(file.data);
-    } else if (ext === '.xlsx') {
-      await this.parseExcel(file.data);
-    } else {
-      throw new Error('只支持 CSV 或 Excel 文件');
-    }
-  }
-
-  private parseCSV(filePath: string) {
-    return new Promise((resolve, reject) => {
-      let rowCount = 0;
-      const results = [];
-
-      fs.createReadStream(filePath)
-        .pipe(parse({ headers: true }))
-        .on('error', reject)
-        .on('data', row => {
-          rowCount++;
-          results.push(row);
-
-          if (results.length >= 1000) {
-            this.logger.info(`写入第 ${rowCount} 行...`);
-            // TODO: 批量写数据库
-            results.length = 0;
-          }
-        })
-        .on('end', () => {
-          this.logger.info(`CSV 解析完成，共 ${rowCount} 行`);
-          resolve(rowCount);
-        });
-    });
-  }
-  private async parseExcel(filePath: string) {
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(filePath);
-    const worksheet = workbook.getWorksheet(1);
-
-    let rowCount = 0;
-    const batch = [];
-
-    worksheet.eachRow((row, rowNumber) => {
-      if (rowNumber === 1) return; // 跳过表头
-
-      const rowData = {
-        col1: row.getCell(1).value,
-        col2: row.getCell(2).value,
-        col3: row.getCell(3).value,
-      };
-
-      batch.push(rowData);
-      rowCount++;
-
-      if (batch.length >= 1000) {
-        this.logger.info(`写入第 ${rowCount} 行...`);
-        // TODO: 批量写数据库
-        batch.length = 0;
-      }
-    });
-
-    this.logger.info(`Excel 解析完成，共 ${rowCount} 行`);
-  }
-
 
   private async getProjByState(
     delayed: boolean | null
@@ -276,6 +206,11 @@ export class ProjectService {
 
     await this.projectRepository.save(project);
     return { success: true, data: project };
+  }
+
+  async batchInsert(projects: Project[]) {
+    await this.projectRepository.save(projects); // 一次性插入
+    return { success: true };
   }
 
   async procedureList(): Promise<Procedure[]> {

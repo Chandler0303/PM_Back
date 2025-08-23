@@ -48,6 +48,12 @@ export class Project {
   type: string;
 
   /**
+   * 业务类型
+   */
+  @Column()
+  businessType: string;
+
+  /**
    * 是否搁置
    */
   @Column()

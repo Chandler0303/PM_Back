@@ -2,7 +2,6 @@ import { Configuration, App } from '@midwayjs/core';
 import * as koa from '@midwayjs/koa';
 import * as validate from '@midwayjs/validate';
 import * as info from '@midwayjs/info';
-import * as upload from '@midwayjs/upload';
 import { join } from 'path';
 import { DefaultErrorFilter } from './filter/default.filter';
 import { ReportMiddleware } from './middleware/report.middleware';
@@ -15,7 +14,6 @@ import * as orm from '@midwayjs/typeorm';
     koa,
     validate,
     orm,
-    upload,
     {
       component: info,
       enabledEnvironment: ['local'],
