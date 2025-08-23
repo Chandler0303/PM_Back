@@ -1,4 +1,4 @@
-import {Inject, Controller, Get, Post, Put, Del, Body, Param} from '@midwayjs/core';
+import {Inject, Controller, Get, Post, Put, Del, Body, Param, Files} from '@midwayjs/core';
 import {Context} from '@midwayjs/koa';
 import {ProjectService} from '../service/project.service'
 import {Project} from "../entity/project.entity";
@@ -54,6 +54,25 @@ export class ProjectController {
   @Put('/modify')
   async modify(@Body() params: Project) {
     return this.projectService.modify(params)
+  }
+  @Post('/import')
+  async upload(@Files('file') files) {
+    console.log(files)
+    return { success: false, message: '请上传文件' };
+    // if (!files || files.length === 0) {
+    //   return { success: false, message: '请上传文件' };
+    // }
+    // console.log(files)
+
+    // const file = files[0]; // 获取第一个文件
+
+    // try {
+    //   await this.projectService.handleImport(file);
+    //   return { success: true, message: '文件上传并解析成功' };
+    // } catch (err) {
+    //   this.ctx.logger.error('文件解析错误:', err);
+    //   return { success: false, message: '文件解析失败' };
+    // }
   }
 
   /**
