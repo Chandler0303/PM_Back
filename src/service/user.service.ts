@@ -47,7 +47,7 @@ export class UserService {
     query.name && (where['name'] = Like(`%${query.name}%`))
     return await this.userRepository.find({
       where,
-      select: { id: true, username: true, name: true, password: true, permissions: true },
+      select: { id: true, username: true, name: true, password: true, permissions: true, avatar: true },
       relations: ['org'],
     });
   }

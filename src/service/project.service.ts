@@ -324,6 +324,7 @@ export class ProjectService {
     const qb = this.projectRepository
       .createQueryBuilder('project')
       .leftJoinAndSelect('project.company', 'company')
+      .leftJoinAndSelect('project.user', 'user')
       .leftJoinAndSelect('project.stages', 'stages')
       .leftJoinAndSelect('stages.nodes', 'node')
       .where(where);

@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import {Company} from './company.entity';
 import {Stage} from './stage.entity'
+import { User } from './user.entity';
 
 /**
  * 项目
@@ -76,6 +77,13 @@ export class Project {
    */
   @ManyToOne(type => Company)
   company: Company;
+
+
+  /**
+   * 管理员
+   */
+  @ManyToOne(type => User, { nullable: true })
+  user: User | null;
 
   /**
    * 项目开始时间

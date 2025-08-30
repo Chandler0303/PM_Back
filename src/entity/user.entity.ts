@@ -35,6 +35,12 @@ export class User {
   name: string;
 
   /**
+   * 头像
+   */
+  @Column({ length: 512 , nullable: true})
+  avatar: string | null;
+
+  /**
    * 部门
    */
   @ManyToOne(type => Org)

@@ -1,12 +1,14 @@
 import { Configuration, App } from '@midwayjs/core';
 import * as koa from '@midwayjs/koa';
-import * as validate from '@midwayjs/validate';
+import * as staticFile from '@midwayjs/static-file';
+import * as validate from '@midwayjs/validate'
 import * as info from '@midwayjs/info';
 import { join } from 'path';
 import { DefaultErrorFilter } from './filter/default.filter';
 import { ReportMiddleware } from './middleware/report.middleware';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import * as orm from '@midwayjs/typeorm';
+import * as busboy from '@midwayjs/busboy';
 
 
 @Configuration({
@@ -14,6 +16,8 @@ import * as orm from '@midwayjs/typeorm';
     koa,
     validate,
     orm,
+    busboy,
+    staticFile,
     {
       component: info,
       enabledEnvironment: ['local'],
@@ -31,5 +35,6 @@ export class MainConfiguration {
     this.app.useMiddleware([AuthMiddleware]);
     // add filter
     this.app.useFilter([DefaultErrorFilter]);
+
   }
 }
