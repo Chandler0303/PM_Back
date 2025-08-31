@@ -29,7 +29,7 @@ export class UserController {
     fs.renameSync(tempFilePath, targetFilePath);
     return {success: true, message: '文件上传成功',
       file: {
-        filePath: targetFilePath,
+        filePath: timestamp + '_' +originalFileName,
       }}
   }
 }
