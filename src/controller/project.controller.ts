@@ -56,9 +56,9 @@ export class ProjectController {
     return this.projectService.modify(params)
   }
 
-  @Post('/batchInsert')
-  async batchInsert(@Body() params: any) {
-    return this.projectService.batchInsert(params.projects);
+  @Post('/import')
+  async import(@Body() params: any) {
+    return this.projectService.import(params.projects, params.mode);
   }
 
   /**

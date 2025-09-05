@@ -66,7 +66,7 @@ export class Node {
   /**
    * 备注
    */
-  @Column({nullable: true, length: 256})
+  @Column({nullable: true, length: 512})
   remark: string;
 
   /**

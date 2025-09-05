@@ -7,6 +7,12 @@ export default {
   koa: {
     port: 7001
   },
+  upload: {
+    dir: path.join(process.cwd(), 'uploads'),   // 上传目录
+    getFilePath(filename: string) {
+      return path.join(process.cwd(), 'uploads', filename);
+    }
+  },
   staticFile: {
     dirs: {
       default: {
@@ -15,12 +21,22 @@ export default {
       },
     }
   },
+  busboy: {
+    whitelist: () => {
+      return [
+        '.jpg',
+        '.jpeg',
+        '.png',
+        '.wgt'
+      ];
+    },
+  },
   typeorm: {
     dataSource: {
       default: {
         type: 'sqlite',
         database: path.join(__dirname, '../../pm.sqlite'),
-        synchronize: true,
+        synchronize: false,
         foreignKeys: true,
         logging: true,
         entities: [

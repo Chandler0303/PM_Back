@@ -1,4 +1,4 @@
-import { Inject, Controller, Post, Files } from '@midwayjs/core';
+import { Inject, Controller, Post, Files, Config } from '@midwayjs/core';
 import { Context } from '@midwayjs/koa';
 import { UploadFileInfo, UploadMiddleware } from '@midwayjs/busboy';
 import path = require('path');
@@ -6,23 +6,24 @@ import * as fs from 'fs';
 
 @Controller('/common')
 export class UserController {
+  @Config('upload.dir')
+  uploadDir: string;
+
   @Inject()
   ctx: Context;
   @Post('/upload', { middleware: [UploadMiddleware] })
-  async uploadImage(@Files() file:  Array<UploadFileInfo>) {
-    console.log(file)
+  async upload(@Files() file:  Array<UploadFileInfo>) {
     // 获取第一个文件的临时路径
     const tempFilePath = file[0].data;
     const originalFileName = file[0].filename;
     const timestamp = Date.now();
 
     // 设置目标保存路径
-    const targetDir = path.join(__dirname, '../../uploads');
-    const targetFilePath = path.join(targetDir, timestamp + '_' +originalFileName);
+    const targetFilePath = path.join(this.uploadDir, timestamp + '_' +originalFileName);
 
     // 确保目标目录存在
-    if (!fs.existsSync(targetDir)) {
-      fs.mkdirSync(targetDir);
+    if (!fs.existsSync(this.uploadDir)) {
+      fs.mkdirSync(this.uploadDir);
     }
 
     // 将临时文件移动到目标路径

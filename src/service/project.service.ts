@@ -7,7 +7,10 @@ import { Node } from '../entity/node.entity';
 import { Procedure } from '../entity/procedure.entity';
 import { Company } from '../entity/company.entity';
 import { Context } from '@midwayjs/koa';
+import path = require('path');
+import * as fs from 'fs';
 
+type ImportMode = 'overwrite' | 'incremental' | 'full';
 @Provide()
 export class ProjectService {
   @InjectEntityModel(Project)
@@ -150,7 +153,6 @@ export class ProjectService {
     return { total, data: contents };
   }
 
-
   private async getProjByState(
     delayed: boolean | null
   ): Promise<number[] | null> {
@@ -208,9 +210,76 @@ export class ProjectService {
     return { success: true, data: project };
   }
 
-  async batchInsert(projects: Project[]) {
-    await this.projectRepository.save(projects); // 一次性插入
+  async import(projects: Project[], mode: ImportMode) {
+    // 使用示例
+    // const dbFile = path.resolve(__dirname, '../../pm.sqlite');
+    // this.backupDatabase(dbFile);
+    if (mode === 'overwrite') {
+      await this.projectRepository.upsert(projects, ['projCode', 'name']);
+      console.log('✅ 覆盖导入完成');
+    } else if (mode === 'incremental') {
+      await this.projectRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Project)
+        .values(projects)
+        .orIgnore()
+        .execute();
+      // console.log('✅ 增量导入完成');
+    } else if (mode === 'full') {
+      // 清空数据
+      await this.nodeRepository.clear();
+      await this.nodeRepository.query(
+        `DELETE FROM sqlite_sequence WHERE name='node'`
+      );
+
+      await this.stageRepository.clear();
+      await this.stageRepository.query(
+        `DELETE FROM sqlite_sequence WHERE name='stage'`
+      );
+
+      await this.projectRepository.clear();
+      await this.projectRepository.query(
+        `DELETE FROM sqlite_sequence WHERE name='project'`
+      );
+
+      // 重新导入（保存时自动插入 stage）
+      await this.projectRepository.save(projects);
+
+      // console.log('✅ 全量导入完成，自增 ID 已重置');
+    }
     return { success: true };
+  }
+  /**
+   * 备份 SQLite 数据库文件
+   * @param dbFilePath 数据库文件路径
+   * @returns 备份文件路径
+   */
+  backupDatabase(dbFilePath: string): string {
+    if (!fs.existsSync(dbFilePath)) {
+      throw new Error(`数据库文件不存在: ${dbFilePath}`);
+    }
+
+     // 根目录 backup 文件夹
+    const rootDir = path.dirname(dbFilePath); // 如果 db 在根目录
+    const backupDir = path.join(rootDir, 'backup');
+
+    // 不存在则创建 backup 文件夹
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir);
+    }
+
+    const ext = path.extname(dbFilePath);
+    const base = path.basename(dbFilePath, ext);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+    const backupFilePath = path.join(backupDir, `${base}-backup-${timestamp}${ext}`);
+
+    // 复制数据库文件到 backup
+    fs.copyFileSync(dbFilePath, backupFilePath);
+
+    console.log(`✅ 数据库已备份到: ${backupFilePath}`);
+    return backupFilePath;
   }
 
   async procedureList(): Promise<Procedure[]> {

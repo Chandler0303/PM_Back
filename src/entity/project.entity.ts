@@ -83,7 +83,13 @@ export class Project {
    * 管理员
    */
   @ManyToOne(type => User, { nullable: true })
-  user: User | null;
+  user: User;
+
+  /**
+   * 备注
+   */
+  @Column({nullable: true, length: 512})
+  remark: string;
 
   /**
    * 项目开始时间
